@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using TwitchDownloaderCLI.Modes.Arguments;
 using TwitchDownloaderCLI.Tools;
@@ -53,7 +54,7 @@ namespace TwitchDownloaderCLI.Modes
             {
                 DownloadThreads = inputOptions.DownloadThreads,
                 ThrottleKib = inputOptions.ThrottleKib,
-                Id = int.Parse(vodIdMatch.ValueSpan),
+                Id = long.Parse(vodIdMatch.ValueSpan),
                 Oauth = inputOptions.Oauth,
                 Filename = inputOptions.OutputFile,
                 Quality = Path.GetExtension(inputOptions.OutputFile)!.ToLower() switch
@@ -62,16 +63,16 @@ namespace TwitchDownloaderCLI.Modes
                     ".m4a" => "Audio",
                     _ => throw new ArgumentException("Only MP4 and M4A audio files are supported.")
                 },
-                CropBeginning = inputOptions.CropBeginningTime > 0.0,
-                CropBeginningTime = TimeSpan.FromSeconds(inputOptions.CropBeginningTime),
-                CropEnding = inputOptions.CropEndingTime > 0.0,
-                CropEndingTime = TimeSpan.FromSeconds(inputOptions.CropEndingTime),
+                TrimBeginning = inputOptions.TrimBeginningTime > TimeSpan.Zero,
+                TrimBeginningTime = inputOptions.TrimBeginningTime,
+                TrimEnding = inputOptions.TrimEndingTime > TimeSpan.Zero,
+                TrimEndingTime = inputOptions.TrimEndingTime,
                 FfmpegPath = string.IsNullOrWhiteSpace(inputOptions.FfmpegPath) ? FfmpegHandler.FfmpegExecutableName : Path.GetFullPath(inputOptions.FfmpegPath),
                 TempFolder = inputOptions.TempFolder,
                 CacheCleanerCallback = directoryInfos =>
                 {
                     logger.LogInfo(
-                        $"{directoryInfos.Length} unmanaged video caches were found at '{inputOptions.TempFolder}' and can be safely deleted. " +
+                        $"{directoryInfos.Length} unmanaged video caches were found at '{directoryInfos.FirstOrDefault()?.Parent?.FullName ?? inputOptions.TempFolder}' and can be safely deleted. " +
                         "Run 'TwitchDownloaderCLI cache help' for more information.");
 
                     return Array.Empty<DirectoryInfo>();

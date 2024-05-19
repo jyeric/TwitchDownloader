@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
@@ -74,11 +75,17 @@ namespace TwitchDownloaderWPF
                 Settings.Default.Save();
             }
 
+            // Replace old crop parameters with new trim parameters
+            Settings.Default.TemplateVod = Regex.Replace(Settings.Default.TemplateVod, "{crop_(?=(?:start|end)(?:_|}))", "{trim_");
+            Settings.Default.TemplateClip = Regex.Replace(Settings.Default.TemplateClip, "{crop_(?=(?:start|end)(?:_|}))", "{trim_");
+            Settings.Default.TemplateChat = Regex.Replace(Settings.Default.TemplateChat, "{crop_(?=(?:start|end)(?:_|}))", "{trim_");
+            Settings.Default.Save();
+
             // Flash the window taskbar icon if it is not in the foreground. This is to mitigate a problem where
             // it will sometimes start behind other windows, usually (but not always) due to the user's actions.
             FlashTaskbarIconIfNotForeground(TimeSpan.FromSeconds(3));
 
-            var currentVersion = Version.Parse("1.54.1");
+            var currentVersion = Version.Parse("1.54.3");
             Title = $"Twitch Downloader v{currentVersion}";
 
             // TODO: extract FFmpeg handling to a dedicated service
@@ -94,15 +101,16 @@ namespace TwitchDownloaderWPF
                 }
                 catch (Exception ex)
                 {
-                    if (MessageBox.Show(string.Format(Translations.Strings.UnableToDownloadFfmpegFull, "https://ffmpeg.org/download.html", Path.Combine(Environment.CurrentDirectory, "ffmpeg.exe")),
-                            Translations.Strings.UnableToDownloadFfmpeg, MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
+                    var messageBoxResult = MessageBox.Show(this, string.Format(Translations.Strings.UnableToDownloadFfmpegFull, "https://ffmpeg.org/download.html", Path.Combine(Environment.CurrentDirectory, "ffmpeg.exe")),
+                        Translations.Strings.UnableToDownloadFfmpeg, MessageBoxButton.OKCancel, MessageBoxImage.Information);
+                    if (messageBoxResult == MessageBoxResult.OK)
                     {
                         Process.Start(new ProcessStartInfo("https://ffmpeg.org/download.html") { UseShellExecute = true });
                     }
 
                     if (Settings.Default.VerboseErrors)
                     {
-                        MessageBox.Show(ex.ToString(), Translations.Strings.VerboseErrorOutput, MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(this, ex.ToString(), Translations.Strings.VerboseErrorOutput, MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
 
