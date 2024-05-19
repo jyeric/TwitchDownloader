@@ -109,7 +109,7 @@ namespace TwitchDownloaderWPF
                     string folderPath = textFolder.Text;
                     if (!Directory.Exists(folderPath))
                     {
-                        MessageBox.Show(Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(this, Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
@@ -143,16 +143,16 @@ namespace TwitchDownloaderWPF
                         chatOptions.EmbedData = checkEmbed.IsChecked.GetValueOrDefault();
                         chatOptions.Filename = Path.Combine(folderPath, Path.GetFileNameWithoutExtension(downloadOptions.Filename) + "." + chatOptions.DownloadFormat);
 
-                        if (downloadOptions.CropBeginning)
+                        if (downloadOptions.TrimBeginning)
                         {
-                            chatOptions.CropBeginning = true;
-                            chatOptions.CropBeginningTime = downloadOptions.CropBeginningTime.TotalSeconds;
+                            chatOptions.TrimBeginning = true;
+                            chatOptions.TrimBeginningTime = downloadOptions.TrimBeginningTime.TotalSeconds;
                         }
 
-                        if (downloadOptions.CropEnding)
+                        if (downloadOptions.TrimEnding)
                         {
-                            chatOptions.CropEnding = true;
-                            chatOptions.CropEndingTime = downloadOptions.CropEndingTime.TotalSeconds;
+                            chatOptions.TrimEnding = true;
+                            chatOptions.TrimEndingTime = downloadOptions.TrimEndingTime.TotalSeconds;
                         }
 
                         ChatDownloadTask chatTask = new ChatDownloadTask
@@ -208,7 +208,7 @@ namespace TwitchDownloaderWPF
                     string folderPath = textFolder.Text;
                     if (!Directory.Exists(folderPath))
                     {
-                        MessageBox.Show(Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(this, Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
@@ -312,15 +312,15 @@ namespace TwitchDownloaderWPF
                     string folderPath = textFolder.Text;
                     if (!Directory.Exists(folderPath))
                     {
-                        MessageBox.Show(Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(this, Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
                     ChatDownloadOptions chatOptions = MainWindow.pageChatDownload.GetOptions(null);
                     chatOptions.Id = chatDownloadPage.downloadId;
                     chatOptions.Filename = Path.Combine(folderPath, FilenameService.GetFilename(Settings.Default.TemplateChat, chatDownloadPage.textTitle.Text, chatOptions.Id,chatDownloadPage.currentVideoTime, chatDownloadPage.textStreamer.Text,
-                        chatOptions.CropBeginning ? TimeSpan.FromSeconds(chatOptions.CropBeginningTime) : TimeSpan.Zero,
-                        chatOptions.CropEnding ? TimeSpan.FromSeconds(chatOptions.CropEndingTime) : chatDownloadPage.vodLength,
+                        chatOptions.TrimBeginning ? TimeSpan.FromSeconds(chatOptions.TrimBeginningTime) : TimeSpan.Zero,
+                        chatOptions.TrimEnding ? TimeSpan.FromSeconds(chatOptions.TrimEndingTime) : chatDownloadPage.vodLength,
                         chatDownloadPage.viewCount.ToString(), chatDownloadPage.game) + "." + chatOptions.FileExtension);
 
                     ChatDownloadTask chatTask = new ChatDownloadTask
@@ -370,15 +370,15 @@ namespace TwitchDownloaderWPF
                     string folderPath = textFolder.Text;
                     if (!Directory.Exists(folderPath))
                     {
-                        MessageBox.Show(Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(this, Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
                     ChatUpdateOptions chatOptions = MainWindow.pageChatUpdate.GetOptions(null);
                     chatOptions.InputFile = chatUpdatePage.InputFile;
                     chatOptions.OutputFile = Path.Combine(folderPath, FilenameService.GetFilename(Settings.Default.TemplateChat, chatUpdatePage.textTitle.Text, chatUpdatePage.VideoId, chatUpdatePage.VideoCreatedAt, chatUpdatePage.textStreamer.Text,
-                        chatOptions.CropBeginning ? TimeSpan.FromSeconds(chatOptions.CropBeginningTime) : TimeSpan.Zero,
-                        chatOptions.CropEnding ? TimeSpan.FromSeconds(chatOptions.CropEndingTime) : chatUpdatePage.VideoLength,
+                        chatOptions.TrimBeginning ? TimeSpan.FromSeconds(chatOptions.TrimBeginningTime) : TimeSpan.Zero,
+                        chatOptions.TrimEnding ? TimeSpan.FromSeconds(chatOptions.TrimEndingTime) : chatUpdatePage.VideoLength,
                         chatUpdatePage.ViewCount.ToString(), chatUpdatePage.Game) + "." + chatOptions.FileExtension);
 
                     ChatUpdateTask chatTask = new ChatUpdateTask
@@ -407,7 +407,7 @@ namespace TwitchDownloaderWPF
                     {
                         if (!Directory.Exists(folderPath))
                         {
-                            MessageBox.Show(Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show(this, Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
 
@@ -450,7 +450,7 @@ namespace TwitchDownloaderWPF
             string folderPath = textFolder.Text;
             if (!Directory.Exists(folderPath))
             {
-                MessageBox.Show(Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this, Translations.Strings.InvaliFolderPathMessage, Translations.Strings.InvalidFolderPath, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -464,19 +464,19 @@ namespace TwitchDownloaderWPF
                         {
                             Oauth = Settings.Default.OAuth,
                             TempFolder = Settings.Default.TempPath,
-                            Id = int.Parse(taskData.Id),
+                            Id = long.Parse(taskData.Id),
                             Quality = (ComboPreferredQuality.SelectedItem as ComboBoxItem)?.Content as string,
                             FfmpegPath = "ffmpeg",
-                            CropBeginning = false,
-                            CropEnding = false,
+                            TrimBeginning = false,
+                            TrimEnding = false,
                             DownloadThreads = Settings.Default.VodDownloadThreads,
                             ThrottleKib = Settings.Default.DownloadThrottleEnabled
                                 ? Settings.Default.MaximumBandwidthKib
                                 : -1
                         };
                         downloadOptions.Filename = Path.Combine(folderPath, FilenameService.GetFilename(Settings.Default.TemplateVod, taskData.Title, taskData.Id, taskData.Time, taskData.Streamer,
-                            downloadOptions.CropBeginning ? downloadOptions.CropBeginningTime : TimeSpan.Zero,
-                            downloadOptions.CropEnding ? downloadOptions.CropEndingTime : TimeSpan.FromSeconds(taskData.Length),
+                            downloadOptions.TrimBeginning ? downloadOptions.TrimBeginningTime : TimeSpan.Zero,
+                            downloadOptions.TrimEnding ? downloadOptions.TrimEndingTime : TimeSpan.FromSeconds(taskData.Length),
                             taskData.Views.ToString(), taskData.Game) + ".mp4");
 
                         VodDownloadTask downloadTask = new VodDownloadTask
@@ -537,8 +537,8 @@ namespace TwitchDownloaderWPF
                         EmbedData = checkEmbed.IsChecked.GetValueOrDefault(),
                         TimeFormat = TimestampFormat.Relative,
                         Id = taskData.Id,
-                        CropBeginning = false,
-                        CropEnding = false
+                        TrimBeginning = false,
+                        TrimEnding = false
                     };
                     if (radioJson.IsChecked == true)
                         downloadOptions.DownloadFormat = ChatFormat.Json;
@@ -547,8 +547,8 @@ namespace TwitchDownloaderWPF
                     else
                         downloadOptions.DownloadFormat = ChatFormat.Text;
                     downloadOptions.Filename = Path.Combine(folderPath, FilenameService.GetFilename(Settings.Default.TemplateChat, taskData.Title, taskData.Id, taskData.Time, taskData.Streamer,
-                        downloadOptions.CropBeginning ? TimeSpan.FromSeconds(downloadOptions.CropBeginningTime) : TimeSpan.Zero,
-                        downloadOptions.CropEnding ? TimeSpan.FromSeconds(downloadOptions.CropEndingTime) : TimeSpan.FromSeconds(taskData.Length),
+                        downloadOptions.TrimBeginning ? TimeSpan.FromSeconds(downloadOptions.TrimBeginningTime) : TimeSpan.Zero,
+                        downloadOptions.TrimEnding ? TimeSpan.FromSeconds(downloadOptions.TrimEndingTime) : TimeSpan.FromSeconds(taskData.Length),
                         taskData.Views.ToString(), taskData.Game) + "." + downloadOptions.FileExtension);
 
                     ChatDownloadTask downloadTask = new ChatDownloadTask
@@ -684,7 +684,6 @@ namespace TwitchDownloaderWPF
 
         private void Window_loaded(object sender, RoutedEventArgs e)
         {
-            Title = Translations.Strings.TitleEnqueueOptions;
             App.RequestTitleBarChange();
         }
 
